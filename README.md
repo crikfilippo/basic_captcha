@@ -13,6 +13,34 @@ A simple php class to generate and check captcha values.
 6. in the same form, add a ``` <input type="text" maxlength="8" name="captcha" placeholder="Input the captcha code" required /> ``` input, needed to let the user input the captcha code.
 7. in the form processing page, use ``` $isCaptchaValid = BasicCaptcha::verify($captcha,$formToken); ``` making sure both the arguments are obtained from the post submission, to check if the captcha input is valid.
 
+# Simplest use example
+
+Exposed form
+
+```
+<?php
+$formToken = Captcha::generateFormToken();
+$captchaValue = Captcha::generate($formToken);
+$captchaBase64 = Captcha::getB64($captchaValue);
+?>
+
+<form>
+<img src="data:image/png;base64,<?php echo $captchaBase64;?>" />	
+<input name="form_token" type="hidden" value="<?php echo $formToken; ?>" readonly>
+<input name="captcha" type="text" minlength="8" maxlength="8" placeholder="Input captcha" required>
+<button type="submit">Submit</button>
+</form>
+```
+
+Backend code verification
+
+```
+<?php
+$captcha = $_GET['captcha'] ?? null;
+$formToken = $_GET['form_token'] ?? null;
+if ( !Captcha::verify($captcha, $formToken) ){ throw new \Exception('invalid captcha'); }
+```
+
 # Audio player
 You can obtain an array of base64 audios by using ```BasicCaptcha::getB64($captchaValue,'audio','en');```
 <br>on your page, add all the obtained audios using <b>hidden</b> audio elements: ``` <audio style="display:none;" class="captcha_audio" src="data:audio/mpeg;base64,<?php echo $a; ?>"></audio> ```
@@ -25,13 +53,7 @@ captcha.setAudioNodes('.captcha_audio');
 captcha.setAudioPlayer('#captcha_audio_button');
 ```
 
-
-# Demo
-You can try a simple form implementation including demo.php, BasicCaptcha.php and BasicCaptcha.js in your project.
-Don't forget to remove the file when no more needed.
-
-
-
 # screenshots
-<img width="276" height="212" alt="image" src="https://github.com/user-attachments/assets/1058044a-9544-4a69-9c04-f2b1824327c5" />
+<img width="454" height="69" alt="Screenshot 2026-07-12 alle 19 11 15" src="https://github.com/user-attachments/assets/7195748e-45e4-4966-86a2-a8c27523b92e" />
+
 
