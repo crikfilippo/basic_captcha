@@ -54,6 +54,7 @@ foreach($captchaBase64Audios as $audio){
   echo '<audio style="display:none;" class="captcha_audio" src="data:audio/mpeg;base64,'.$audio.'"></audio>';
 }
 ?>
+<button type="button" id="captcha_audio_button"> Play captcha audio </button>
 ``` 
 <br>then include the BasicCaptcha.js class, and use it as follows : 
 <br>
