@@ -60,7 +60,7 @@ foreach($captchaBase64Audios as $audio){
 <br>
 ```
 <script>
-let captcha = new BasicCaptcha({'wrapperQuery':'#captcha-wrapper' ,'logEnabled':true ,'audioPauseDurationMs':800});
+let captcha = new BasicCaptcha({'logEnabled':true ,'audioPauseDurationMs':800});
 captcha.setAudioNodes('.captcha_audio');
 captcha.setAudioPlayer('#captcha_audio_button');
 </script>
