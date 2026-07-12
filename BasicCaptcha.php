@@ -8,7 +8,7 @@ namespace BasicCaptcha;
  *
  * @author Filippo Maria Grilli
  * @github crikfilippo
- * @version 1.2.0
+ * @version 1.3.0
  * @since 2026-01-15
  * @license MIT
  * @link https://github.com/crikfilippo/BasicCaptcha
@@ -16,8 +16,9 @@ namespace BasicCaptcha;
  */
 
 class BasicCaptcha{
-	
-	private static string $key = 'lisnLJNBUI678624'; //salt key, please use your own
+
+	private static bool $isReady = false;
+	private static string $key; //salt key set using ::setParams()
 	private static string $alg = 'aes-128-cbc'; //encryption algo
 	private static int $maxTokenSeconds = 3600; //max token time, in seconds
 	private static int $minTokenSeconds = 5; //min token time, in seconds
@@ -66,9 +67,23 @@ class BasicCaptcha{
 		]
 	];
 
+	//check required params
+	public static function checkReady(){
+        if( ! self::$isReady){ throw new \Exception('Crypto not initialized, please use ::setParams()'); }
+    }
+
+	//set required params
+    public static function setParams(
+        string $key
+     ){
+        self::$key = $key;
+        self::$isReady = true;
+    }
+
 	//generate a token to be sent along with the captcha
 	public static function generateFormToken() : string
 	{
+		self::checkReady();
 		$randomPrefix = bin2hex(random_bytes(2));
 		$payload = $randomPrefix.'_'.time();
         $sig = hash_hmac('sha256', $payload, self::$key);
@@ -78,6 +93,7 @@ class BasicCaptcha{
 	//generate captcha value itself
 	public static function generate(string $formToken) : string
 	{
+		self::checkReady();
 		$c = hash_hmac('sha256', $formToken, self::$key);
         $c = substr($c, 0, 8);
 		$c = self::fixChars($c);
@@ -87,6 +103,7 @@ class BasicCaptcha{
 	//check a captcha value (form input) using form token 
 	public static function verify(string $captcha,string $formToken) : bool
 	{
+		self::checkReady();
 		if(strlen($captcha) != 8){return false;}
 		if(strlen($formToken) < 20 || strlen($formToken) > 120){return false;}
 		if( ! self::isFormTokenInTime($formToken)){ return false; }
@@ -98,6 +115,7 @@ class BasicCaptcha{
 	//check if form token was issued before allowed maximum
 	private static function isFormTokenInTime(string $formToken) : bool
 	{
+		self::checkReady();
 		try{
 
             $parts = explode('.', $formToken, 2);
