@@ -69,7 +69,7 @@ class BasicCaptcha{
 
 	//check required params
 	public static function checkReady(){
-        if( ! self::$isReady){ throw new \Exception('Crypto not initialized, please use ::setParams()'); }
+        if( ! self::$isReady){ throw new \Exception('BasicCaptcha not initialized, please use ::setParams()'); }
     }
 
 	//set required params
