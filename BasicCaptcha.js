@@ -110,8 +110,8 @@ class BasicCaptcha{
 	}
 
 	//logging utility
-	log(a,b,c,d){ if(this.logger == undefined){ console.log(a,b,c,d); }else{ this.logger.log(a,b,c,d); } }
-	error(a,b,c){ if(this.logger == undefined){ console.error(a,b,c); }else{ this.logger.error(a,b,c); } }
-	warn(a,b){ if(this.logger == undefined){ console.warn(a,b); }else{ this.logger.warn(a,b); } }
+	log(a,b,c,d){ if(this.logger == undefined){ if(this.isLogEnabled){ console.log(a,b,c,d); } }else{ this.logger.log(a,b,c,d); } }
+	error(a,b,c){ if(this.logger == undefined){ if(this.isLogEnabled){ console.error(a,b,c); } }else{ this.logger.error(a,b,c); } }
+	warn(a,b){ if(this.logger == undefined){ if(this.isLogEnabled){ console.warn(a,b); } }else{ this.logger.warn(a,b); } }
 
 }
