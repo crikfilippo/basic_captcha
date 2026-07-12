@@ -21,7 +21,7 @@ class BasicCaptcha{
 	//  
 
 	instanceName = undefined;
-	wrapper = undefined;
+	//wrapper = undefined;
 	isLogEnabled = undefined;
 	audio = {
 		nodes : []
@@ -41,8 +41,8 @@ class BasicCaptcha{
             try{ this.logger = new BasicConsoleLogger({instanceName : this.instanceName, isLogEnabled : this.isLogEnabled}); }
 			catch(e){ this.logger = undefined; }
 			this.log('loading...',fName);
-			this.wrapper = document.querySelector(params.wrapperQuery ?? '#captcha-wrapper');
-			if(this.wrapper == undefined){ this.error('wrapper node not found ('+(params.wrapperQuery ?? '#captcha-wrapper')+')',fName,true); }
+			//this.wrapper = document.querySelector(params.wrapperQuery ?? '#captcha-wrapper');
+			//if(this.wrapper == undefined){ this.error('wrapper node not found ('+(params.wrapperQuery ?? '#captcha-wrapper')+')',fName,true); }
 			this.audio.waitMs = params.audioPauseDurationMs ?? 800;
 			
 			
