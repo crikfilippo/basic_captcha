@@ -18,7 +18,6 @@ namespace BasicCaptcha;
 class BasicCaptcha{
 	
 	private static string $key = 'lisnLJNBUI678624'; //salt key, please use your own
-	private static string $ive = 'fecb016b666c47c2'; //initialization vector, 16 characters
 	private static string $alg = 'aes-128-cbc'; //encryption algo
 	private static int $maxTokenSeconds = 3600; //max token time, in seconds
 	private static array $b64AudioChars = [ //b64 audio of possible characters, audio/mpeg
@@ -70,14 +69,16 @@ class BasicCaptcha{
 	public static function generateFormToken() : string
 	{
 		$randomPrefix = bin2hex(random_bytes(2));
-		$timeString = $randomPrefix.'_'.time();
-		return  openssl_encrypt($timeString,self::$alg,self::$key,0,self::$ive);
+		$payload = $randomPrefix.'_'.time();
+        $sig = hash_hmac('sha256', $payload, self::$key);
+        return $payload . '.' . $sig;
 	}
 
 	//generate captcha value itself
 	public static function generate(string $formToken) : string
 	{
-		$c = hash('crc32',self::$key.$formToken,false); 
+		$c = hash_hmac('sha256', $formToken, self::$key);
+        $c = substr($c, 0, 8);
 		$c = self::fixChars($c);
 		return $c;
 	}
@@ -86,21 +87,30 @@ class BasicCaptcha{
 	public static function verify(string $captcha,string $formToken) : bool
 	{
 		if(strlen($captcha) != 8){return false;}
-		if(strlen($formToken) < 20 || strlen($formToken) > 100){return false;}
+		if(strlen($formToken) < 20 || strlen($formToken) > 120){return false;}
 		if( ! self::isFormTokenInTime($formToken)){ return false; }
 		$captcha = strtoupper($captcha);
 		$check = self::generate($formToken);
-		return self::fixChars($captcha,true) == self::fixChars($check,true);
+		return hash_equals(self::fixChars($captcha,true), self::fixChars($check,true));
 	}
 
 	//check if form token was issued before allowed maximum
 	private static function isFormTokenInTime(string $formToken) : bool
 	{
 		try{
-			$formTokenTime =  openssl_decrypt($formToken,self::$alg,self::$key,0,self::$ive);
-			$formTokenTime = substr($formTokenTime, (strpos($formTokenTime,'_') + 1) );
-			if( ! is_numeric($formTokenTime)){return false;}
-			return (time() - $formTokenTime) > self::$maxTokenSeconds ? false : true;
+
+            $parts = explode('.', $formToken, 2);
+            if (count($parts) !== 2) return false;
+            [$payload, $sig] = $parts;
+
+            $expected = hash_hmac('sha256', $payload, self::$key);
+            if (!hash_equals($expected, $sig)) return false;   // token was tampered
+
+            $p = explode('_', $payload);
+            $ts = (int)end($p);
+            $elapsed = time() - $ts;
+            return $elapsed >= 0 && $elapsed <= self::$maxTokenSeconds;
+
 		}catch(\Throwable $e){
 			return false;
 		}
@@ -110,15 +120,21 @@ class BasicCaptcha{
 	//force uppercase and replace easily mistaken characters
 	private static function fixChars(string $s,  bool $reset = false) : string
 	{
+        $chars = ['%','#','?'];
 		$s = strtoupper($s);
-		if($reset){
-			$s = str_replace('%','0',$s); 
-			$s = str_replace('?','0',$s); 
-			$s = str_replace('#','0',$s); 
-		}
-		else{
-			$s = str_replace('0',['%','#','?'][rand(0,2)],$s); ; 
-		}
+        
+		if($reset){ 
+            foreach($chars as $c){ $s = str_replace($c,'0',$s); } 
+            return $s;
+        }
+
+        $charPos = strpos($s, '0');
+        while ($charPos !== false) {
+            $replacement = $chars[rand(0, count($chars) - 1)];
+            $s = substr_replace($s, $replacement, $charPos, 1);
+            $charPos = strpos($s, '0', $charPos + 1);
+        }
+    
 		return $s;
 	}
 
