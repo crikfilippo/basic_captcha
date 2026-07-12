@@ -4,6 +4,16 @@ A simple php class to generate and check captcha values.
 <br>- The check is not case sensitive.
 <br>- A token can be used within 10 minutes (customizable static property).
 
+# Setup
+
+Set class parameters once at application start:
+
+```
+BasicCaptcha::setParams(
+    key: '<your_secret_key>'
+);
+```
+
 # Usage
 1. include the class in your project and assign a new own value to the static class property $key.
 2. use ``` $formToken = BasicCaptcha::generateFormToken(); ```  to obtain a new token to be sent alongside the captcha value inserted by the form user.
