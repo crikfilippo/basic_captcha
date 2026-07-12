@@ -2,16 +2,12 @@
 namespace BasicCaptcha;
 
 /**
- * Basic Captcha
- *
- * This class handles the generation, validation and rendering of CAPTCHAs.
  *
  * @author Filippo Maria Grilli
  * @github crikfilippo
  * @version 1.3.0
  * @since 2026-01-15
  * @license MIT
- * @link https://github.com/crikfilippo/BasicCaptcha
  *
  */
 
