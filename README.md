@@ -2,7 +2,7 @@ A simple php class to generate and check captcha values.
 <br><br>Notes:
 <br>- Single file class, no database needed.
 <br>- The check is not case sensitive.
-<br>- A token can be used within 1 hour (customizable static property).
+<br>- A token can be used within 10 minutes (customizable static property).
 
 # Usage
 1. include the class in your project and assign a new own value to the static class property $key.
@@ -53,7 +53,7 @@ captcha.setAudioNodes('.captcha_audio');
 captcha.setAudioPlayer('#captcha_audio_button');
 ```
 
-# screenshots
+# Screenshots
 <img width="454" height="69" alt="Screenshot 2026-07-12 alle 19 11 15" src="https://github.com/user-attachments/assets/7195748e-45e4-4966-86a2-a8c27523b92e" />
 
 
