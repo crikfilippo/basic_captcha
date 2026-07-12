@@ -164,19 +164,61 @@ class BasicCaptcha{
 		$captcha = BasicCaptcha::fixChars($captcha);
 		
 		if($returnedMedia == 'image'){
-			
-			$image = imagecreatetruecolor(100, 35);
-			$white = imagecolorallocate($image, 255, 255, 255);
-			$black = imagecolorallocate($image, 0, 0, 0);
-			imagefill($image, 0, 0, $white);
-			imagestring($image, 4, 10, 10, $captcha, $black);
-			imagefilter($image, IMG_FILTER_SMOOTH, 16);
-			ob_start(); imagepng($image); $imageData = ob_get_clean();
-			$base64 = base64_encode($imageData);
-			imagedestroy($image);
-			$media = $base64;
-			
-		}
+
+            $w = 240; $h = 55;
+            $image = imagecreatetruecolor($w, $h);
+            $white = imagecolorallocate($image, 255, 255, 255);
+            imagefill($image, 0, 0, $white); // background
+            $tx1 = 8; $ty1 = 8; $tx2 = 230; $ty2 = 50; // text region bounds
+
+            // background noise dots
+            for($n = 0; $n < 2000; $n++){
+                $col = imagecolorallocate($image, rand(150,220), rand(150,220), rand(150,220));
+                imagesetpixel($image, rand($tx1,$tx2), rand($ty1,$ty2), $col);
+            }
+
+            // draw each char: small canvas -> scale up -> rotate
+            $x = 12;
+            for($i = 0; $i < strlen($captcha); $i++){
+
+                $tmp = imagecreatetruecolor(12, 18);
+                $bg = imagecolorallocate($tmp, 255, 255, 255);
+                imagefill($tmp, 0, 0, $bg);
+                imagecolortransparent($tmp, $bg);
+                $col = imagecolorallocate($tmp, rand(120,190), rand(120,190), rand(120,190)); // softer chars
+                imagestring($tmp, 5, 2, 1, $captcha[$i], $col); // draw char
+
+                $big = imagecreatetruecolor(28, 40);
+                imagealphablending($big, false);
+                imagesavealpha($big, true);
+                $trans = imagecolorallocatealpha($big, 0, 0, 0, 127);
+                imagefill($big, 0, 0, $trans);
+                imagecopyresized($big, $tmp, 0, 0, 0, 0, 28, 40, 12, 18); // scale up
+
+                $rot = imagerotate($big, rand(-25,25), $trans); // rotate on transparent
+                imagealphablending($rot, false);
+                imagesavealpha($rot, true);
+
+                imagealphablending($image, true);
+                imagecopy($image, $rot, $x, rand(4,14), 0, 0, imagesx($rot), imagesy($rot));
+
+                imagedestroy($tmp); imagedestroy($big); imagedestroy($rot);
+                $x += rand(22,28); // irregular spacing
+            }
+
+            // disturbance line
+            for($l = 0; $l < 10; $l++){
+                $col = imagecolorallocate($image, rand(90,130), rand(90,130), rand(90,130));
+                imageline($image, rand($tx1,$tx2), rand($ty1,$ty2), rand($tx1,$tx2), rand($ty1,$ty2), $col);
+            }
+
+            imagefilter($image, IMG_FILTER_SMOOTH, 2);
+
+            ob_start(); imagepng($image); $imageData = ob_get_clean();
+            $media = base64_encode($imageData);
+            imagedestroy($image);
+
+        }
 		
 		else if($returnedMedia == 'audio'){
 			
