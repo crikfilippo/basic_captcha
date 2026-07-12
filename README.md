@@ -19,13 +19,13 @@ Exposed form
 
 ```
 <?php
-$formToken = Captcha::generateFormToken();
-$captchaValue = Captcha::generate($formToken);
-$captchaBase64 = Captcha::getB64($captchaValue);
+$formToken = BasicCaptcha::generateFormToken();
+$captchaValue = BasicCaptcha::generate($formToken);
+$captchaBase64Image = BasicCaptcha::getB64($captchaValue);
 ?>
 
 <form>
-<img src="data:image/png;base64,<?php echo $captchaBase64;?>" />	
+<img src="data:image/png;base64,<?php echo $captchaBase64Image;?>" />	
 <input name="form_token" type="hidden" value="<?php echo $formToken; ?>" readonly>
 <input name="captcha" type="text" minlength="8" maxlength="8" placeholder="Input captcha" required>
 <button type="submit">Submit</button>
@@ -42,15 +42,27 @@ if ( !Captcha::verify($captcha, $formToken) ){ throw new \Exception('invalid cap
 ```
 
 # Audio player
-You can obtain an array of base64 audios by using ```BasicCaptcha::getB64($captchaValue,'audio','en');```
-<br>on your page, add all the obtained audios using <b>hidden</b> audio elements: ``` <audio style="display:none;" class="captcha_audio" src="data:audio/mpeg;base64,<?php echo $a; ?>"></audio> ```
+You can obtain an array of base64 audios by using ```$audios = BasicCaptcha::getB64($captchaValue,'audio','en');```
+<br>on your page, add all the obtained audios using <b>hidden</b> audio elements: ``` <audio style="display:none;" class="captcha_audio" src="data:audio/mpeg;base64,<?php echo $audio; ?>"></audio> ```
 <br>and a button to play them all: ``` <button type="button" id="captcha_audio_button"> Play captcha audio </button> ```
+<br>her is a complete example : 
+```
+<?php
+//in your form, just after your captcha input
+$captchaBase64Audios = BasicCaptcha::getB64($captchaValue,'audio','en');
+foreach($captchaBase64Audios as $audio){
+  echo '<audio style="display:none;" class="captcha_audio" src="data:audio/mpeg;base64,'.$audio.'"></audio>';
+}
+?>
+``` 
 <br>then include the BasicCaptcha.js class, and use it as follows : 
 <br>
-``` 
+```
+<script>
 let captcha = new BasicCaptcha({'wrapperQuery':'#captcha-wrapper' ,'logEnabled':true ,'audioPauseDurationMs':800});
 captcha.setAudioNodes('.captcha_audio');
 captcha.setAudioPlayer('#captcha_audio_button');
+</script>
 ```
 
 # Screenshots
