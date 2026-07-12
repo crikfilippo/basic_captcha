@@ -8,10 +8,10 @@ namespace BasicCaptcha;
  *
  * @author Filippo Maria Grilli
  * @github crikfilippo
- * @version 1.0.0
+ * @version 1.2.0
  * @since 2026-01-15
  * @license MIT
- * @link https://github.com/crikfilippo/basic_captcha
+ * @link https://github.com/crikfilippo/BasicCaptcha
  *
  */
 
