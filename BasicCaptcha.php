@@ -15,7 +15,6 @@ class BasicCaptcha{
 
 	private static bool $isReady = false;
 	private static string $key; //salt key set using ::setParams()
-	private static string $alg = 'aes-128-cbc'; //encryption algo
 	private static int $maxTokenSeconds = 3600; //max token time, in seconds
 	private static int $minTokenSeconds = 5; //min token time, in seconds
 	private static array $b64AudioChars = [ //b64 audio of possible characters, audio/mpeg
